@@ -5,11 +5,74 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Pegawai {
+  id_pegawai      String         @id @default(cuid())
+  nama            String
+  tempat_lahir    String
+  tanggal_lahir   DateTime
+  alamat          String
+  rt              String
+  rw              String
+  kelurahan       String
+  kecamatan       String
+  kota            String
+  provinsi        String
+  no_telepon      String
+  no_ktp          String         @unique
+  npwp            String         @unique
+  no_rekening     String
+  bank_dki_cabang String
+  status          PegawaiStatus  @default(AKTIF)
+  pendidikan      Pendidikan
+  jenis_pekerjaan JenisPekerjaan
+
+  cuti Cuti[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Cuti {
+  id_cuti         String     @id @default(cuid())
+  id_pegawai      String
+  tanggal_mulai   DateTime
+  tanggal_selesai DateTime
+  alasan          String?
+  catatan         String?
+  status          CutiStatus @default(MENUNGGU)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Pegawai Pegawai? @relation(fields: [id_pegawai], references: [id_pegawai], onDelete: Cascade)
+}
+
+enum Pendidikan {
+  SD
+  SMP
+  SMA
+}
+
+enum JenisPekerjaan {
+  PETUGAS_PPSU
+}
+
+enum CutiStatus {
+  MENUNGGU
+  DISETUJUI
+  DITOLAK
+}
+
+enum PegawaiStatus {
+  AKTIF
+  TIDAK_AKTIF
+  CUTI
 }
